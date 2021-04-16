@@ -35,7 +35,6 @@ class Game implements iGame {
   public function getOptions(): array {
     if (empty($this->options)) {
       $dice = $this->getDice();
-      var_dump($dice);
       sort($dice);
       if ($dice == [1, 2, 3, 4, 5]) {
         $this->options[] = new Option(array_sum($dice), "Small Straight");
