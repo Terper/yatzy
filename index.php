@@ -6,8 +6,6 @@ require_once "./Player.php";
 
 session_start();
 
-var_dump($_SESSION);
-
 function showGame() {
   echo "<form method='post'>";
   foreach ($_SESSION["game"]->getDice() as $key => $value) {
@@ -33,18 +31,20 @@ function showPlayerConfig() {
   echo "<form method='post'>";
   for ($i = 0; $i < $_SESSION["config"]->players; $i++) {
     $playerNr = $i + 1;
-    echo "Player {$playerNr} <input name='player{$i}'><br>";
+    echo "Player {$playerNr} <input name='player{$i}' required><br>";
   }
   echo "<input type='submit'>";
   echo "</form>";
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  var_dump($_POST);
   do {
     if (isset($_POST["config"])) {
       $_SESSION["config"] = new Config((int)$_POST["sides"], (int)$_POST["amount"], (int)$_POST["rolls"], (int)$_POST["players"]);
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
       $_SESSION["rolls"] = 1;
+      $_SESSION["players"] = [];
       showPlayerConfig();
       exit();
     }
@@ -54,7 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       }
       break;
     }
-    var_dump($_SESSION["players"]);
     if (empty($_POST)) {
       $_SESSION["rolls"] = $_SESSION["config"]->rolls;
     }
