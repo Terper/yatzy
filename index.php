@@ -5,11 +5,10 @@ require_once "./Config.php";
 require_once "./Player.php";
 
 session_start();
-
 function showGame(): void {
   echo "<form method='post'>";
-  if ($_SESSION["config"]) {
-    # code...
+  if ($_SESSION["config"]->players > 1) {
+    echo $_SESSION['players'][currentPlayer()]->getName() . "'s turn<br>";
   }
   foreach ($_SESSION["game"]->getDice() as $key => $value) {
     echo "<input type='checkbox' name='{$key} 'value='{$key}'> {$value}<br>";
@@ -39,8 +38,8 @@ function showPlayerConfig(): void {
   echo "<input type='submit'>";
   echo "</form>";
 }
-function currentPlayer(): string {
-  return $_SESSION["players"][($_SESSION["gameNum"] % $_SESSION["config"]->players)]->getName();
+function currentPlayer() {
+  return (($_SESSION["gameNum"] - 1) % $_SESSION["config"]->players);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -69,7 +68,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($_POST)) {
       $_SESSION["rolls"] = $_SESSION["config"]->rolls;
     }
-    echo currentPlayer();
     $_SESSION["rolls"]++;
     if ($_SESSION["rolls"] >= $_SESSION["config"]->rolls) {
       var_dump($_SESSION["game"]->getOptions());
