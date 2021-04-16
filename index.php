@@ -2,8 +2,11 @@
 
 require_once "./Game.php";
 require_once "./Config.php";
+require_once "./Player.php";
 
 session_start();
+
+var_dump($_SESSION);
 
 function showGame() {
   echo "<form method='post'>";
@@ -21,18 +24,37 @@ function showConfig() {
   echo "Dice sides: <input type='number' min='1' value='6' name='sides'><br>";
   echo "Dice amount: <input type='number' min='1' value='5' name='amount'><br>";
   echo "Rolls: <input type='number' min='1' value='3' name='rolls'><br>";
+  echo "Players: <input type='number' min='1' value='1' name='players'><br>";
   echo "<input type='submit' name='config'>";
+  echo "</form>";
+}
+
+function showPlayerConfig() {
+  echo "<form method='post'>";
+  for ($i = 0; $i < $_SESSION["config"]->players; $i++) {
+    $playerNr = $i + 1;
+    echo "Player {$playerNr} <input name='player{$i}'><br>";
+  }
+  echo "<input type='submit'>";
   echo "</form>";
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   do {
     if (isset($_POST["config"])) {
-      $_SESSION["config"] = new Config((int)$_POST["sides"], (int)$_POST["amount"], (int)$_POST["rolls"]);
+      $_SESSION["config"] = new Config((int)$_POST["sides"], (int)$_POST["amount"], (int)$_POST["rolls"], (int)$_POST["players"]);
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
       $_SESSION["rolls"] = 1;
+      showPlayerConfig();
+      exit();
+    }
+    if (isset($_POST["player0"])) {
+      foreach ($_POST as $key => $value) {
+        $_SESSION["players"][] = new Player($value);
+      }
       break;
     }
+    var_dump($_SESSION["players"]);
     if (empty($_POST)) {
       $_SESSION["rolls"] = $_SESSION["config"]->rolls;
     }
@@ -41,7 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       var_dump($_SESSION["game"]->getOptions());
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
       $_SESSION["rolls"] = 1;
-      break;
     }
     foreach ($_POST as $key => $value) {
       $_SESSION["game"]->roll($value);
@@ -49,6 +70,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   } while (0);
   showGame();
 } else {
-  unset($_SESSION);
+  session_unset();
   showConfig();
 }

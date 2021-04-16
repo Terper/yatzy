@@ -8,6 +8,7 @@ class Config implements iConfig {
     public int $sides,
     public int $amount,
     public int $rolls,
+    public int $players,
   ) {
   }
 }
