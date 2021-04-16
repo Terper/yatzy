@@ -8,6 +8,9 @@ session_start();
 
 function showGame(): void {
   echo "<form method='post'>";
+  if ($_SESSION["config"]) {
+    # code...
+  }
   foreach ($_SESSION["game"]->getDice() as $key => $value) {
     echo "<input type='checkbox' name='{$key} 'value='{$key}'> {$value}<br>";
   }
@@ -36,11 +39,6 @@ function showPlayerConfig(): void {
   echo "<input type='submit'>";
   echo "</form>";
 }
-/* Old
-function currentUser(){
-  return $_SESSION["users"][$_SESSION["gameNr"] % count($_SESSION["users"])];
-}
-*/
 function currentPlayer(): string {
   return $_SESSION["players"][($_SESSION["gameNum"] % $_SESSION["config"]->players)]->getName();
 }
