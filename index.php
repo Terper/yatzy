@@ -3,11 +3,12 @@
 require_once "./Game.php";
 require_once "./Config.php";
 
-
+session_start();
 
 function showGame() {
+  echo "<form method='post'>";
   foreach ($_SESSION["game"]->getDice() as $key => $value) {
-    echo "{$value}: <input type='checkbox' name='{$key} 'value='{$value}'><br>";
+    echo "<input type='checkbox' name='{$key} 'value='{$key}'> {$value}<br>";
   }
   echo "<input type='submit'>";
   echo "</form>";
@@ -22,7 +23,6 @@ function showConfig() {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  var_dump($_POST);
   do {
     if (isset($_POST["config"])) {
       $_SESSION["config"] = new Config((int)$_POST["sides"], (int)$_POST["amount"]);
@@ -30,8 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       showGame();
       break;
     }
+    foreach ($_POST as $key => $value) {
+      $_SESSION["game"]->roll($value);
+    }
+    showGame();
   } while (0);
-  var_dump($_SESSION);
 } else {
   unset($_SESSION);
   showConfig();
