@@ -38,6 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $_SESSION["rolls"]++;
     if ($_SESSION["rolls"] >= $_SESSION["config"]->rolls) {
+      var_dump($_SESSION["game"]->getOptions());
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
       $_SESSION["rolls"] = 1;
       break;
