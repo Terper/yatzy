@@ -5,8 +5,9 @@ interface iConfig {
 
 class Config implements iConfig {
   public function __construct(
-    public $sides,
-    public $amount
+    public int $sides,
+    public int $amount,
+    public int $rolls,
   ) {
   }
 }
