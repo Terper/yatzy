@@ -29,6 +29,7 @@ class Player implements iPlayer {
   }
   public function addScore(string $scoreType, int $score): void {
     $this->savedScores[$scoreType] = $score;
+    $this->score += $score;
   }
   public function doesScoreTypeExist(string $key): bool {
     return !empty($this->savedScores[$key]);
