@@ -7,6 +7,7 @@ interface iGame {
   public function roll($index);
   public function getDice();
   public function getOptions();
+  public function getOption($optionIndex);
 }
 
 class Game implements iGame {
@@ -74,6 +75,9 @@ class Game implements iGame {
       }
     }
     return $this->options;
+  }
+  public function getOption($optionIndex): array {
+    return $this->options[$optionIndex];
   }
   private function fill(): void {
     for ($i = 0; $i < $this->amount; $i++) {
