@@ -22,6 +22,47 @@ function showGame(): void {
   echo "</form>";
 }
 
+function showScoreboard(): void {
+  $scoreTypes = [
+    "Ones", "Twos", "Threes",
+    "Fours", "Fives", "Sixes",
+    "One Par", "Two Pairs",
+    "Three of a Kind", "Four of a Kind",
+    "Full House", "Small Straight",
+    "Large Straight", "Yatzy", "Chance"
+  ];
+  echo "<table>";
+  echo "<caption>Scoreboard<caption>";
+  echo "<tr>";
+  echo "<th></th>";
+  foreach ($_SESSION["players"] as $playerValue) {
+    echo "<th>";
+    echo $playerValue->getName();
+    echo "</th>";
+  }
+  echo "</tr>";
+  foreach ($scoreTypes as $scoreTypesValue) {
+    echo "<tr>";
+    echo "<th>{$scoreTypesValue}</th>";
+    foreach ($_SESSION["players"] as $playerValue) {
+      echo "<td>";
+      if ($playerValue->doesScoreTypeExist($scoreTypesValue)) {
+        echo $playerValue->getScoreType($scoreTypesValue);
+      }
+      echo "</td>";
+    }
+    echo "</tr>";
+  }
+  echo "<tr><th>Total score</th>";
+  foreach ($_SESSION["players"] as $playerValue) {
+    echo "<td>";
+    echo $playerValue->getScore();
+    echo "</td>";
+  }
+  echo "</tr>";
+  echo "</table>";
+}
+
 function showConfig(): void {
   echo "<form method='post'>";
   echo "Dice sides: <input type='number' min='1' value='6' name='sides'><br>";
@@ -117,6 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   } while (0);
   var_dump($_SESSION["players"]);  // remove
   showGame();
+  showScoreboard();
 } else {
   session_unset();
   showConfig();
