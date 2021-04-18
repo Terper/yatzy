@@ -9,6 +9,7 @@ class Config implements iConfig {
     public int $amount,
     public int $rolls,
     public int $players,
+    public bool $forced,
   ) {
   }
 }
