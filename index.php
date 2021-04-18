@@ -26,7 +26,7 @@ function showScoreboard(): void {
   $scoreTypes = [
     "Ones", "Twos", "Threes",
     "Fours", "Fives", "Sixes",
-    "One Par", "Two Pairs",
+    "One Pair", "Two Pairs",
     "Three of a Kind", "Four of a Kind",
     "Full House", "Small Straight",
     "Large Straight", "Yatzy", "Chance"
