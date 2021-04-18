@@ -1,15 +1,13 @@
 <?php
 
+session_start();
+
 require_once "./Game.php";
 require_once "./Config.php";
 require_once "./Player.php";
 
-session_start();
 
 echo "<link rel='stylesheet' href='style.css'>";
-
-
-
 
 function showGame(): void {
   echo "<form method='post'>";
