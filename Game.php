@@ -8,6 +8,7 @@ interface iGame {
   public function getDice();
   public function getOptions();
   public function getOption($optionIndex);
+  public function getForcedScore($scoreType);
 }
 
 class Game implements iGame {
@@ -77,6 +78,14 @@ class Game implements iGame {
   }
   public function getOption($optionIndex): array {
     return $this->options[$optionIndex];
+  }
+  public function getForcedScore($scoreType): int {
+    foreach ($this->getOptions() => $value) {
+      if ($value->scoreType == $scoreType) {
+        return $value->score;
+      }
+    }
+    return 0;
   }
   private function fill(): void {
     for ($i = 0; $i < $this->amount; $i++) {
