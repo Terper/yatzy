@@ -38,14 +38,37 @@ function showPlayerConfig(): void {
   echo "<input type='submit'>";
   echo "</form>";
 }
+function showOptions(): void {
+  echo "<form method='post'>";
+  if ($_SESSION["config"]->players > 1) {
+    echo $_SESSION['players'][currentPlayer()]->getName() . "'s turn<br>";
+  }
+  echo "Dice: ";
+  foreach ($_SESSION["game"]->getDice() as $key => $value) {
+    echo "{$value}";
+  }
+  echo "<br>";
+  foreach ($_SESSION["game"]->getOptions() as $key => $value) {
+    if (!$_SESSION["players"][currentPlayer()]->doesScoreTypeExist($value->scoreType)) {
+      $scoreType = $value->scoreType;
+      $score = $value->score;
+      echo "{$scoreType} for {$score}<input type='radio' name='option' value='{$scoreType}&{$score}' required><br>";
+    }
+  }
+  if (!$_SESSION["players"][currentPlayer()]->doesScoreTypeExist("Chance")) {
+    echo "As chance? <input type='checkbox' name='chance'><br>";
+  }
+  echo "<input type='submit'>";
+  echo "</form>";
+}
 function currentPlayer() {
   return (($_SESSION["gameNum"] - 1) % $_SESSION["config"]->players);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  var_dump($_POST);
   do {
-    if (isset($_POST["config"])) {
+    var_dump($_POST);
+    if (!empty($_POST["config"])) {
       $_SESSION["config"] = new Config(
         (int)$_POST["sides"],
         (int)$_POST["amount"],
@@ -59,26 +82,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       showPlayerConfig();
       exit();
     }
-    if (isset($_POST["player0"])) {
+    if (!empty($_POST["player0"])) {
       foreach ($_POST as $key => $value) {
         $_SESSION["players"][] = new Player($value);
       }
       break;
     }
-    if (empty($_POST)) {
-      $_SESSION["rolls"] = $_SESSION["config"]->rolls;
-    }
-    $_SESSION["rolls"]++;
-    if ($_SESSION["rolls"] >= $_SESSION["config"]->rolls) {
-      var_dump($_SESSION["game"]->getOptions());
+    if (!empty($_POST["option"])) {
+      $values = explode("&", $_POST["option"]);
+      if (!empty($_POST["chance"])) {
+        $_SESSION["players"][currentPlayer()]->addScore("Chance", (int)$values[1]);
+      } else {
+        $_SESSION["players"][currentPlayer()]->addScore($values[0], (int)$values[1]);
+      }
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
       $_SESSION["rolls"] = 1;
       $_SESSION["gameNum"]++;
+      break;
+    }
+    $_SESSION["rolls"]++;
+    if (empty($_POST)) {
+      $_SESSION["rolls"] = $_SESSION["config"]->rolls;
+    }
+    if ($_SESSION["rolls"] >= $_SESSION["config"]->rolls) {
+      showOptions();
+      exit();
     }
     foreach ($_POST as $key => $value) {
       $_SESSION["game"]->roll($value);
     }
   } while (0);
+  var_dump($_SESSION["players"]);  // remove
   showGame();
 } else {
   session_unset();
