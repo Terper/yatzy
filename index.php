@@ -99,9 +99,6 @@ function showOptions(): void {
       echo "{$scoreType} for {$score}<input type='radio' name='option' value='{$scoreType}&{$score}' required><br>";
     }
   }
-  if (!$_SESSION["players"][currentPlayer()]->doesScoreTypeExist("Chance")) {
-    echo "As chance? <input type='checkbox' name='chance'><br>";
-  }
   echo "<input type='submit'>";
   echo "</form>";
 }
@@ -134,11 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if (!empty($_POST["option"])) {
       $values = explode("&", $_POST["option"]);
-      if (!empty($_POST["chance"])) {
-        $_SESSION["players"][currentPlayer()]->addScore("Chance", (int)$values[1]);
-      } else {
-        $_SESSION["players"][currentPlayer()]->addScore($values[0], (int)$values[1]);
-      }
+      $_SESSION["players"][currentPlayer()]->addScore($values[0], (int)$values[1]);
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
       $_SESSION["rolls"] = 1;
       $_SESSION["gameNum"]++;

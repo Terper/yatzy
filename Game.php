@@ -72,6 +72,7 @@ class Game implements iGame {
       foreach ($diceValues as $key => $value) {
         $this->options[] = new Option($key * $value, $this->getName($key));
       }
+      $this->options[] = new Option(array_sum($dice), "Chance");
     }
     return $this->options;
   }
