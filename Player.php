@@ -32,6 +32,6 @@ class Player implements iPlayer {
     $this->score += $score;
   }
   public function doesScoreTypeExist(string $key): bool {
-    return !empty($this->savedScores[$key]);
+    return isset($this->savedScores[$key]);
   }
 }
