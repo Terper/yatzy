@@ -69,6 +69,7 @@ function showConfig(): void {
   echo "Dice amount: <input type='number' min='1' value='5' name='amount' readonly><br>";
   echo "Rolls: <input type='number' min='1' value='3' name='rolls'><br>";
   echo "Players: <input type='number' min='1' value='1' name='players'><br>";
+  echo "Forced: <input type='checkbox' name='forced'><br>";
   echo "<input type='submit' name='config'>";
   echo "</form>";
 }
