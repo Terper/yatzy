@@ -67,7 +67,7 @@ class Game implements iGame {
         if (!empty($search2[1])) {
           $this->options[] = new Option(2 * $search2[0] + 2 * $search2[1], "Two Pairs");
         } else {
-          $this->options[] = new Option(2 * $search2[0], "A Pair");
+          $this->options[] = new Option(2 * $search2[0], "One Pair");
         }
       }
       foreach ($diceValues as $key => $value) {
