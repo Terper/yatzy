@@ -5,6 +5,9 @@ require_once "./Config.php";
 require_once "./Player.php";
 
 session_start();
+
+echo "<link rel='stylesheet' href='style.css'>";
+
 function showGame(): void {
   echo "<form method='post'>";
   if ($_SESSION["config"]->players > 1) {
