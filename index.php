@@ -65,8 +65,8 @@ function showScoreboard(): void {
 
 function showConfig(): void {
   echo "<form method='post'>";
-  echo "Dice sides: <input type='number' min='1' value='6' name='sides'><br>";
-  echo "Dice amount: <input type='number' min='1' value='5' name='amount'><br>";
+  echo "Dice sides: <input type='number' min='1' value='6' name='sides' readonly><br>";
+  echo "Dice amount: <input type='number' min='1' value='5' name='amount' readonly><br>";
   echo "Rolls: <input type='number' min='1' value='3' name='rolls'><br>";
   echo "Players: <input type='number' min='1' value='1' name='players'><br>";
   echo "<input type='submit' name='config'>";
@@ -111,7 +111,6 @@ function currentPlayer() {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   do {
-    var_dump($_POST); // Remove
     if (!empty($_POST["config"])) {
       $_SESSION["config"] = new Config(
         (int)$_POST["sides"],
@@ -156,7 +155,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $_SESSION["game"]->roll($value);
     }
   } while (0);
-  var_dump($_SESSION["players"]);  // remove
   showGame();
   showScoreboard();
 } else {
