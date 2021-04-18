@@ -2,7 +2,7 @@
 
 interface iPlayer {
   public function getScore();
-  public function getScoreType($scoreType);
+  public function getScoreType(string $scoreType);
   public function getName();
   public function addScore(string $scoreType, int $score);
   public function doesScoreTypeExist(string $scoreType);
@@ -24,7 +24,7 @@ class Player implements iPlayer {
   public function getName(): string {
     return $this->name;
   }
-  public function getScoreType($scoreType): array {
+  public function getScoreType(string $scoreType): string {
     return $this->savedScores[$scoreType];
   }
   public function addScore(string $scoreType, int $score): void {
