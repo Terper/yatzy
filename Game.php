@@ -80,7 +80,7 @@ class Game implements iGame {
     return $this->options[$optionIndex];
   }
   public function getForcedScore($scoreType): int {
-    foreach ($this->getOptions() => $value) {
+    foreach ($this->getOptions() as $value) {
       if ($value->scoreType == $scoreType) {
         return $value->score;
       }
