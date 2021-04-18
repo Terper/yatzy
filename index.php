@@ -131,6 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         (int)$_POST["amount"],
         (int)$_POST["rolls"],
         (int)$_POST["players"],
+        ($_POST["players"] * 15) + ($_POST["players"] * 3),
         !empty($_POST["forced"]) ? true : false,
       );
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
@@ -168,6 +169,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         showOptions();
         exit();
       }
+    }
+    if ($_SESSION["gameNum"] >= $_SESSION["config"]->rounds) {
+      showScoreboard();
+      exit();
     }
     foreach ($_POST as $key => $value) {
       $_SESSION["game"]->roll($value);
