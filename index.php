@@ -67,7 +67,7 @@ function currentPlayer() {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   do {
-    var_dump($_POST);
+    var_dump($_POST); // Remove
     if (!empty($_POST["config"])) {
       $_SESSION["config"] = new Config(
         (int)$_POST["sides"],
