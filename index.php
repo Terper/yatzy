@@ -8,10 +8,16 @@ session_start();
 
 echo "<link rel='stylesheet' href='style.css'>";
 
+
+
+
 function showGame(): void {
   echo "<form method='post'>";
   if ($_SESSION["config"]->players > 1) {
     echo $_SESSION['players'][currentPlayer()]->getName() . "'s turn<br>";
+  }
+  if ($_SESSION["config"]->forced) {
+    echo "Goal is to get " . currentType() . "<br>";
   }
   foreach ($_SESSION["game"]->getDice() as $key => $value) {
     echo "<input type='checkbox' name='{$key} 'value='{$key}'> {$value}<br>";
@@ -65,10 +71,11 @@ function showScoreboard(): void {
 
 function showConfig(): void {
   echo "<form method='post'>";
-  echo "Dice sides: <input type='number' min='1' value='6' name='sides'><br>";
-  echo "Dice amount: <input type='number' min='1' value='5' name='amount'><br>";
+  echo "Dice sides: <input type='number' min='1' value='6' name='sides' readonly><br>";
+  echo "Dice amount: <input type='number' min='1' value='5' name='amount' readonly><br>";
   echo "Rolls: <input type='number' min='1' value='3' name='rolls'><br>";
   echo "Players: <input type='number' min='1' value='1' name='players'><br>";
+  echo "Forced: <input type='checkbox' name='forced'><br>";
   echo "<input type='submit' name='config'>";
   echo "</form>";
 }
@@ -106,15 +113,27 @@ function currentPlayer() {
   return (($_SESSION["gameNum"] - 1) % $_SESSION["config"]->players);
 }
 
+function currentType() {
+  $scoreTypes = [
+    "Ones", "Twos", "Threes",
+    "Fours", "Fives", "Sixes",
+    "One Pair", "Two Pairs",
+    "Three of a Kind", "Four of a Kind",
+    "Full House", "Small Straight",
+    "Large Straight", "Yatzy", "Chance"
+  ];
+  return $scoreTypes[floor($_SESSION["gameNum"] / $_SESSION["config"]->players) - 1];
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   do {
-    var_dump($_POST); // Remove
     if (!empty($_POST["config"])) {
       $_SESSION["config"] = new Config(
         (int)$_POST["sides"],
         (int)$_POST["amount"],
         (int)$_POST["rolls"],
-        (int)$_POST["players"]
+        (int)$_POST["players"],
+        !empty($_POST["forced"]) ? true : false,
       );
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
       $_SESSION["gameNum"] = 1;
@@ -142,14 +161,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $_SESSION["rolls"] = $_SESSION["config"]->rolls;
     }
     if ($_SESSION["rolls"] >= $_SESSION["config"]->rolls) {
-      showOptions();
-      exit();
+      if ($_SESSION["config"]->forced) {
+        $_SESSION["players"][currentPlayer()]->addScore(currentType(), $_SESSION["game"]->getForcedScore(currentType()));
+        $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
+        $_SESSION["rolls"] = 1;
+        $_SESSION["gameNum"]++;
+      } else {
+        showOptions();
+        exit();
+      }
     }
     foreach ($_POST as $key => $value) {
       $_SESSION["game"]->roll($value);
     }
   } while (0);
-  var_dump($_SESSION["players"]);  // remove
   showGame();
   showScoreboard();
 } else {
