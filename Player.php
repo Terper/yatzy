@@ -1,6 +1,7 @@
 <?php
 
 interface iPlayer {
+  public function checkBonus();
   public function getScore();
   public function getScoreType(string $scoreType);
   public function getName();
@@ -17,6 +18,23 @@ class Player implements iPlayer {
     $this->name = $name;
     $this->savedScores = [];
     $this->score = 0;
+  }
+  public function checkBonus() {
+    foreach ($this->savedScores as $key => $value) {
+      if ($key == "Bonus") {
+        return;
+      }
+    }
+    $total = 0;
+    $valid = ["Ones", "Twos", "Threes", "Four", "Fives", "Sixes"];
+    foreach ($this->savedScores as $key => $value) {
+      if (in_array($key, $valid)) {
+        $total += $value;
+      }
+    }
+    if ($total >= 63) {
+      $this->addScore("Bonus", 35);
+    }
   }
   public function getScore(): int {
     return $this->score;

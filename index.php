@@ -29,6 +29,7 @@ function showScoreboard(): void {
   $scoreTypes = [
     "Ones", "Twos", "Threes",
     "Fours", "Fives", "Sixes",
+    "Bonus",
     "One Pair", "Two Pairs",
     "Three of a Kind", "Four of a Kind",
     "Full House", "Small Straight",
@@ -49,6 +50,9 @@ function showScoreboard(): void {
     echo "<th>{$scoreTypesValue}</th>";
     foreach ($_SESSION["players"] as $playerValue) {
       echo "<td>";
+      if ($scoreTypesValue == "Bonus") {
+        $playerValue->checkBonus();
+      }
       if ($playerValue->doesScoreTypeExist($scoreTypesValue)) {
         echo $playerValue->getScoreType($scoreTypesValue);
       }
@@ -96,7 +100,6 @@ function showOptions(): void {
     echo "{$value}";
   }
   echo "<br>";
-  $scratch = [];
   $scoreTypes = [
     "Ones", "Twos", "Threes",
     "Fours", "Fives", "Sixes",
@@ -148,7 +151,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         (int)$_POST["amount"],
         (int)$_POST["rolls"],
         (int)$_POST["players"],
-        //!empty($_POST["forced"]) ? $_POST["players"] * 15 : ($_POST["players"] * 15) + ($_POST["players"] * 3),
         $_POST["players"] * 15,
         !empty($_POST["forced"]) ? true : false,
       );
