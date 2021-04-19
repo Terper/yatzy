@@ -1,11 +1,10 @@
 <?php
 
-session_start();
-
 require_once "./Game.php";
 require_once "./Config.php";
 require_once "./Player.php";
 
+session_start();
 
 echo "<link rel='stylesheet' href='style.css'>";
 
@@ -97,16 +96,34 @@ function showOptions(): void {
     echo "{$value}";
   }
   echo "<br>";
+  $scratch = [];
+  $scoreTypes = [
+    "Ones", "Twos", "Threes",
+    "Fours", "Fives", "Sixes",
+    "One Pair", "Two Pairs",
+    "Three of a Kind", "Four of a Kind",
+    "Full House", "Small Straight",
+    "Large Straight", "Yatzy", "Chance"
+  ];
   foreach ($_SESSION["game"]->getOptions() as $key => $value) {
+    $scoreType = $value->scoreType;
+    $score = $value->score;
     if (!$_SESSION["players"][currentPlayer()]->doesScoreTypeExist($value->scoreType)) {
-      $scoreType = $value->scoreType;
-      $score = $value->score;
       echo "{$scoreType} for {$score}<input type='radio' name='option' value='{$scoreType}&{$score}' required><br>";
     }
   }
+  echo "Scratch <input type='radio' name='option' value='scratch' required><br>";
+  echo "<select name='scratch'>";
+  foreach ($scoreTypes as $value) {
+    if (!$_SESSION["game"]->doesOptionExist($value) && !$_SESSION["players"][currentPlayer()]->doesScoreTypeExist($value)) {
+      echo "<option value='${value}'>${value}</option>";
+    }
+  }
+  echo "</select><br>";
   echo "<input type='submit'>";
   echo "</form>";
 }
+
 function currentPlayer() {
   return (($_SESSION["gameNum"] - 1) % $_SESSION["config"]->players);
 }
@@ -120,7 +137,7 @@ function currentType() {
     "Full House", "Small Straight",
     "Large Straight", "Yatzy", "Chance"
   ];
-  return $scoreTypes[floor($_SESSION["gameNum"] / $_SESSION["config"]->players) - 1];
+  return $scoreTypes[floor(($_SESSION["gameNum"] - 1) / $_SESSION["config"]->players)];
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -131,7 +148,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         (int)$_POST["amount"],
         (int)$_POST["rolls"],
         (int)$_POST["players"],
-        ($_POST["players"] * 15) + ($_POST["players"] * 3),
+        //!empty($_POST["forced"]) ? $_POST["players"] * 15 : ($_POST["players"] * 15) + ($_POST["players"] * 3),
+        $_POST["players"] * 15,
         !empty($_POST["forced"]) ? true : false,
       );
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
@@ -148,7 +166,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       break;
     }
     if (!empty($_POST["option"])) {
-      $values = explode("&", $_POST["option"]);
+      if ($_POST["option"] == "scratch") {
+        $values = [$_POST["scratch"], 0];
+      } else {
+        $values = explode("&", $_POST["option"]);
+      }
       $_SESSION["players"][currentPlayer()]->addScore($values[0], (int)$values[1]);
       $_SESSION["game"] = new Game($_SESSION["config"]->sides, $_SESSION["config"]->amount);
       $_SESSION["rolls"] = 1;
@@ -170,7 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
       }
     }
-    if ($_SESSION["gameNum"] >= $_SESSION["config"]->rounds) {
+    if ($_SESSION["gameNum"] > $_SESSION["config"]->rounds) {
       showScoreboard();
       exit();
     }
