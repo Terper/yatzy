@@ -141,6 +141,9 @@ function showOptions(): void {
   echo "<input type='submit'>";
   echo "</form>";
 }
+function showRestart(): void {
+  echo "<a href='./'>Restart</a>";
+}
 
 function currentPlayer() {
   return (($_SESSION["gameNum"] - 1) % $_SESSION["config"]->players);
@@ -212,6 +215,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($_SESSION["gameNum"] > $_SESSION["config"]->rounds) {
       showScoreboard();
       showScore();
+      showRestart();
       exit();
     }
     foreach ($_POST as $key => $value) {
