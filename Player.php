@@ -4,6 +4,7 @@ interface iPlayer {
   public function checkBonus();
   public function getScore();
   public function getScoreType(string $scoreType);
+  public function countSavedScores();
   public function getName();
   public function addScore(string $scoreType, int $score);
   public function doesScoreTypeExist(string $scoreType);
@@ -20,13 +21,20 @@ class Player implements iPlayer {
     $this->score = 0;
   }
   public function checkBonus() {
+    $valid = ["Ones", "Twos", "Threes", "Fours", "Fives", "Sixes"];
+    $counter = 0;
     foreach ($this->savedScores as $key => $value) {
       if ($key == "Bonus") {
         return;
       }
+      if (in_array($key, $valid)) {
+        $counter++;
+      }
+    }
+    if ($counter != count($valid)) {
+      return;
     }
     $total = 0;
-    $valid = ["Ones", "Twos", "Threes", "Four", "Fives", "Sixes"];
     foreach ($this->savedScores as $key => $value) {
       if (in_array($key, $valid)) {
         $total += $value;
@@ -34,10 +42,15 @@ class Player implements iPlayer {
     }
     if ($total >= 63) {
       $this->addScore("Bonus", 35);
+    } else {
+      $this->addScore("Bonus", 0);
     }
   }
   public function getScore(): int {
     return $this->score;
+  }
+  public function countSavedScores() {
+    return count($this->savedScores);
   }
   public function getName(): string {
     return $this->name;
@@ -48,6 +61,7 @@ class Player implements iPlayer {
   public function addScore(string $scoreType, int $score): void {
     $this->savedScores[$scoreType] = $score;
     $this->score += $score;
+    $this->checkBonus();
   }
   public function doesScoreTypeExist(string $key): bool {
     return isset($this->savedScores[$key]);

@@ -16,6 +16,8 @@ function showGame(): void {
   if ($_SESSION["config"]->forced) {
     echo "Goal is to get " . currentType() . "<br>";
   }
+  echo "Choose which dice to roll.<br>";
+  echo "Leave empty if content with current dice.<br>";
   foreach ($_SESSION["game"]->getDice() as $key => $value) {
     echo "<input type='checkbox' name='{$key} 'value='{$key}'> {$value}<br>";
   }
@@ -50,11 +52,12 @@ function showScoreboard(): void {
     echo "<th>{$scoreTypesValue}</th>";
     foreach ($_SESSION["players"] as $playerValue) {
       echo "<td>";
-      if ($scoreTypesValue == "Bonus") {
-        $playerValue->checkBonus();
-      }
       if ($playerValue->doesScoreTypeExist($scoreTypesValue)) {
-        echo $playerValue->getScoreType($scoreTypesValue);
+        if ($playerValue->getScoreType($scoreTypesValue) == 0 && !$_SESSION["config"]->forced && $scoreTypesValue != "Bonus") {
+          echo "--";
+        } else {
+          echo $playerValue->getScoreType($scoreTypesValue);
+        }
       }
       echo "</td>";
     }
@@ -110,6 +113,8 @@ function showOptions(): void {
   if ($_SESSION["config"]->players > 1) {
     echo $_SESSION['players'][currentPlayer()]->getName() . "'s turn<br>";
   }
+
+  echo "Choose which score to get.<br>";
   echo "Dice: ";
   foreach ($_SESSION["game"]->getDice() as $key => $value) {
     echo "{$value}";
@@ -130,14 +135,20 @@ function showOptions(): void {
       echo "{$scoreType} for {$score}<input type='radio' name='option' value='{$scoreType}&{$score}' required><br>";
     }
   }
-  echo "Scratch <input type='radio' name='option' value='scratch' required><br>";
-  echo "<select name='scratch'>";
+  $elements = [];
   foreach ($scoreTypes as $value) {
     if (!$_SESSION["game"]->doesOptionExist($value) && !$_SESSION["players"][currentPlayer()]->doesScoreTypeExist($value)) {
-      echo "<option value='${value}'>${value}</option>";
+      $elements[$value]  = "<option value='${value}'>${value}</option>";
     }
   }
-  echo "</select><br>";
+  if (count($elements) != 0) {
+    array_unshift($elements, "<select name='scratch'>");
+    array_unshift($elements, "Scratch <input type='radio' name='option' value='scratch' required checked><br>");
+    array_push($elements, "</select>");
+    foreach ($elements as $value) {
+      echo $value;
+    }
+  }
   echo "<input type='submit'>";
   echo "</form>";
 }
@@ -212,16 +223,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
       }
     }
-    if ($_SESSION["gameNum"] > $_SESSION["config"]->rounds) {
-      showScoreboard();
-      showScore();
-      showRestart();
-      exit();
-    }
     foreach ($_POST as $key => $value) {
       $_SESSION["game"]->roll($value);
     }
   } while (0);
+  if ($_SESSION["gameNum"] > $_SESSION["config"]->rounds) {
+    showScoreboard();
+    showScore();
+    showRestart();
+    exit();
+  }
   showGame();
   showScoreboard();
 } else {
