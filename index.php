@@ -70,6 +70,21 @@ function showScoreboard(): void {
   echo "</table>";
 }
 
+function showScore(): void {
+  $arr = [];
+  foreach ($_SESSION["players"] as $player) {
+    $arr[$player->getName()] = $player->getScore();
+  }
+  arsort($arr);
+  foreach ($arr as $key => $value) {
+    if (array_key_first($arr) == $key) {
+      echo "<b>{$key} won with {$value} points</b><br>";
+    } else {
+      echo "{$key} got  {$value} points<br>";
+    }
+  }
+}
+
 function showConfig(): void {
   echo "<form method='post'>";
   echo "Dice sides: <input type='number' min='1' value='6' name='sides' readonly><br>";
@@ -196,6 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if ($_SESSION["gameNum"] > $_SESSION["config"]->rounds) {
       showScoreboard();
+      showScore();
       exit();
     }
     foreach ($_POST as $key => $value) {
